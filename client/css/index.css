@@ -1,0 +1,31 @@
+#links{
+    height: 90vh;
+    overflow-y: scroll;
+    margin: 10px;
+}
+
+.icon-folder{
+    color: #edc500;
+    margin-right: 8px;
+}
+
+.icon-file{
+    color: rgb(124, 124, 124);
+    margin-right: 8px;
+}
+
+.file-item{
+    /* border-bottom: 1px solid #ccc; */
+    padding: 10px 8px;
+    cursor: pointer;
+}
+
+.file-item:hover{
+    background-color: #e6f1ff;
+}
+
+.file-size{
+    margin-left: 10px;
+    font-size: 0.8em;
+    color: gray;
+}
