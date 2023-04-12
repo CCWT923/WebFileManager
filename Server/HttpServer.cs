@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
 using System.Net.NetworkInformation;
+using Server;
 
 namespace HttpServer
 {
@@ -19,6 +20,7 @@ namespace HttpServer
         private string baseAddress;
         private int port;
         List<string> ipAddressList;
+        public bool ServerRunning { get; set; }
         public HttpServer()
         {
             listener = new HttpListener();
@@ -101,6 +103,7 @@ namespace HttpServer
             return ipList;
         }
 
+
         /// <summary>
         /// 开始服务器
         /// </summary>
@@ -108,17 +111,20 @@ namespace HttpServer
         {
             listener.Prefixes.Add(baseAddress);
             listener.Start();
-            Dictionary<string, string> dictParam = new Dictionary<string, string>()
-            {
-                {"host", Environment.MachineName},
-                {"ip", string.Join(",",ipAddressList)},
-                {"port", port.ToString()}
-            };
-            FormUrlEncodedContent content = new FormUrlEncodedContent(dictParam!);
+            this.ServerRunning = true;
+            //Dictionary<string, string> dictParam = new Dictionary<string, string>()
+            //{
+            //    {"host", Environment.MachineName},
+            //    {"ip", string.Join(",",ipAddressList)},
+            //    {"port", port.ToString()}
+            //};
+            //FormUrlEncodedContent content = new FormUrlEncodedContent(dictParam!);
 
+            Logger.AddLog($"服务器已运行，端口号：{port}");
             while (true)
             {
-                var context = await listener.GetContextAsync();
+
+                HttpListenerContext context = await listener.GetContextAsync();
                 
                 var response = context.Response;
                 //System.Diagnostics.Trace.WriteLine("当前 response 对象地址：" + response.GetHashCode().ToString("X"));
@@ -131,6 +137,9 @@ namespace HttpServer
 
                 //获取请求的URL地址
                 var requestUrl = context.Request.Url;
+
+                Logger.AddLog("收到请求：" + requestUrl);
+
                 if(requestUrl?.AbsolutePath == "/path/get/computer") //获取所有驱动器列表
                 {
                     DriveItem[] driveItems = GetDriveInfo();

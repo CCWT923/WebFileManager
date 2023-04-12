@@ -1,4 +1,4 @@
-const host = "http://10.152.77.3:1000";
+const host = "http://127.0.0.1:1000";
 let disk = "";
 /**
  * 当前所在的路径

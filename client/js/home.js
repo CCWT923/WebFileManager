@@ -1,4 +1,4 @@
-const host = "http://10.152.77.3:1000";
+const host = "http://127.0.0.1:1000";
 
 function getDriveList(){
     fetch(host + "/path/get/computer",{
@@ -53,7 +53,7 @@ function getDriveList(){
  */
 function navigateToDiskFile(e){
     var disk = e.currentTarget.getAttribute("data-disk");
-    window.location.href = "./index.html?disk=" + disk;
+    window.location.href = "./file-browser.html?disk=" + disk;
 }
 /**
  * {
