@@ -11,6 +11,7 @@ using System.Text.Json.Serialization;
 using System.Web;
 using System.Net.NetworkInformation;
 using Server;
+using System.Diagnostics;
 
 namespace HttpServer
 {
@@ -103,12 +104,61 @@ namespace HttpServer
             return ipList;
         }
 
+        /// <summary>
+        /// 检查和设置防火墙规则
+        /// </summary>
+        /// <param name="port"></param>
+        private void CheckFirewall(string ruleName, int port)
+        {
+            try
+            {
+                ProcessStartInfo psi = new ProcessStartInfo();
+                Process process = new Process();
+                psi.FileName = "netsh";
+                psi.WindowStyle = ProcessWindowStyle.Hidden;
+                psi.CreateNoWindow = true;
+                psi.RedirectStandardOutput = true; //重定向标准输出
+
+                //检查规则是否存在
+                psi.Arguments = $"advfirewall firewall show rule name={ruleName}";
+
+                process.StartInfo = psi;
+                process.Start();
+                var output = process.StandardOutput.ReadToEnd();
+
+                string[] resArr = output.Trim().Split("\r\n");
+                bool ruleExists = false;
+                if (resArr.Length > 0)
+                {
+                    if (resArr[0].IndexOf(ruleName) != -1)
+                    {
+                        ruleExists = true;
+                    }
+                }
+
+                if (ruleExists)
+                {
+                    psi.Arguments = $"advfirewall firewall set rule name={ruleName} new localport={port}";
+                }
+                else
+                {
+                    psi.Arguments = $"advfirewall firewall add rule name={ruleName} dir=in action=allow protocol=TCP localport={port}";
+                }
+                process.Start();
+            }
+            catch (Exception ex)
+            {
+                
+            }
+        }
 
         /// <summary>
         /// 开始服务器
         /// </summary>
         public async void Start()
         {
+            //设置防火墙端口规则
+            CheckFirewall("MyHttpServer@3568", port);
             listener.Prefixes.Add(baseAddress);
             listener.Start();
             this.ServerRunning = true;
